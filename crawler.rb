@@ -4,6 +4,7 @@ require 'rubygems'
 require 'tjplurker'
 require 'tzinfo'
 require 'zip'
+require 'fileutils'
 
 include TJP
 
@@ -33,11 +34,15 @@ accessSecret = setting['accessSecret']
 
 timeZone = TZInfo::Timezone.get('Asia/Hong_Kong')
 
-today = DateTime.new().strftime('%Y%m%d')
+today = DateTime.now().strftime('%Y%m%d')
 startTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 0, 0, 0, 0)
 startTimeMs = startTime.strftime('%Q')
 endTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 23, 59, 59, 59)
 endTimeMs = endTime.strftime('%Q')
+
+#Create output folder if not existed
+
+FileUtils::mkdir_p './output'
 
 #Start to get plurk which posted on today
 
@@ -102,7 +107,7 @@ publicPlurks.each do |publicPlurk|
 			zipfile.add(outputFile, outputFilePath)
 		end
 
-		File.delete(outputFile)
-		
+		File.delete(outputFilePath)
+
 	end
 end
