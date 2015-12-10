@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'tjplurker'
 require 'tzinfo'
+require 'zip'
 
 include TJP
 
@@ -32,6 +33,7 @@ accessSecret = setting['accessSecret']
 
 timeZone = TZInfo::Timezone.get('Asia/Hong_Kong')
 
+today = DateTime.new().strftime('%Y%m%d%H%M%S')
 startTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 0, 0, 0, 0)
 startTimeMs = startTime.strftime('%Q')
 endTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 23, 59, 59, 59)
@@ -56,7 +58,11 @@ publicPlurks.each do |publicPlurk|
 
 	if postedDateMs > startTimeMs and postedDateMs < endTimeMs
 
-		fileHtml = File.new("./output/#{postedDate}.html", 'w')
+		outputFile = "#{postedDate}.html"
+
+		outputFilePath = "./output/#{outputFile}"
+
+		fileHtml = File.new(outputFilePath, 'w')
 		fileHtml.puts '<html><body><head><meta charset="UTF-8"></head>'
 
 		username = getUserName(tjp, publicPlurk['owner_id'])
@@ -87,5 +93,13 @@ publicPlurks.each do |publicPlurk|
 
 		fileHtml.puts '</body></html>'
 		fileHtml.close
+
+		#Zip all of the output file
+
+		zipFileName = "./output/" + username + today + ".zip"
+
+		Zip::File.open(zipFileName, Zip::File::CREATE) do |zipfile|
+			zipfile.add(outputFile, outputFilePath)
+		end
 	end
 end
