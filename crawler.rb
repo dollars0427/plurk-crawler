@@ -101,5 +101,8 @@ publicPlurks.each do |publicPlurk|
 		Zip::File.open(zipFileName, Zip::File::CREATE) do |zipfile|
 			zipfile.add(outputFile, outputFilePath)
 		end
+
+		File.delete(outputFile)
+		
 	end
 end
