@@ -33,7 +33,7 @@ accessSecret = setting['accessSecret']
 
 timeZone = TZInfo::Timezone.get('Asia/Hong_Kong')
 
-today = DateTime.new().strftime('%Y%m%d%H%M%S')
+today = DateTime.new().strftime('%Y%m%d')
 startTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 0, 0, 0, 0)
 startTimeMs = startTime.strftime('%Q')
 endTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 23, 59, 59, 59)
