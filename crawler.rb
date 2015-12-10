@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'tjplurker'
+require 'tzinfo'
 
 include TJP
 
@@ -29,6 +30,8 @@ accessSecret = setting['accessSecret']
 
 #Get the start time and end time of today
 
+timeZone =
+
 startTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 0, 0, 0, 0)
 startTimeMs = startTime.strftime('%Q')
 endTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 23, 59, 59, 59)
@@ -38,11 +41,13 @@ endTimeMs = endTime.strftime('%Q')
 
 tjp = TJPlurker.new(consumerKey, consumerSecert, accessKey, accessSecret)
 
-publicPlurks = tjp.api('/APP/Timeline/getPublicPlurks', user_id: userId)['plurks']
+userId = get_uid("Altia").to_i
+
+publicPlurks = tjp.api('/APP/Timeline/getPublicPlurks', user_id: userId, limit:50)['plurks']
 
 publicPlurks.each do |publicPlurk|
 
-	postedDate = DateTime.httpdate(publicPlurk['posted']).strftime('%Y%m%d%H%M%S')
+	postedDate = DateTime.httpdate(publicPlurk['posted']).utc_to_local.strftime('%Y%m%d%H%M%S')
 	postedDateMs = DateTime.httpdate(publicPlurk['posted']).strftime('%Q')
 
 	#If the plurk is posted on today, write the content and reponse to html flie
@@ -52,13 +57,30 @@ publicPlurks.each do |publicPlurk|
 		fileHtml = File.new("./output/#{postedDate}.html", 'w')
 		fileHtml.puts '<html><body><head><meta charset="UTF-8"></head>'
 
+		username = getUserName(tjp, publicPlurk['owner_id'])
+
+		content = publicPlurk['content']
+
+		postedDate = DateTime.httpdate(publicPlurk['posted']).strftime('%Y-%m-%d %H:%M')
+
+		fileHtml.puts '發噗日期：' + postedDate  + '<br>'
+		fileHtml.puts '發噗者：' + username  + '<br><br>'
+
+		fileHtml.puts content
+		fileHtml.puts '<br><hr>'
+
 		publicPlurkId = publicPlurk['plurk_id']
 
 		responses = tjp.api('/APP/Responses/get', plurk_id: publicPlurkId)['responses']
 
 		responses.each do |response|
-			fileHtml.puts response['content']
-			fileHtml.puts '</br>'
+
+			responser = getUserName(tjp, response['user_id'])
+			responseContent = response['content']
+
+			fileHtml.puts responser + ':' + '<br>'
+			fileHtml.puts responseContent
+			fileHtml.puts '<br><hr>'
 		end
 
 		fileHtml.puts '</body></html>'
