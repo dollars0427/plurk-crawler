@@ -30,7 +30,7 @@ accessSecret = setting['accessSecret']
 
 #Get the start time and end time of today
 
-timeZone =
+timeZone = TZInfo::Timezone.get('Asia/Hong_Kong')
 
 startTime = DateTime.new(DateTime.now.year, DateTime.now.month, DateTime.now.day, 0, 0, 0, 0)
 startTimeMs = startTime.strftime('%Q')
@@ -41,14 +41,16 @@ endTimeMs = endTime.strftime('%Q')
 
 tjp = TJPlurker.new(consumerKey, consumerSecert, accessKey, accessSecret)
 
-userId = get_uid("Altia").to_i
+user = ARGV.first
+
+userId = get_uid(user).to_i
 
 publicPlurks = tjp.api('/APP/Timeline/getPublicPlurks', user_id: userId, limit:50)['plurks']
 
 publicPlurks.each do |publicPlurk|
 
-	postedDate = DateTime.httpdate(publicPlurk['posted']).utc_to_local.strftime('%Y%m%d%H%M%S')
-	postedDateMs = DateTime.httpdate(publicPlurk['posted']).strftime('%Q')
+	postedDate = timeZone.utc_to_local(DateTime.httpdate(publicPlurk['posted'])).strftime('%Y%m%d%H%M%S')
+	postedDateMs = timeZone.utc_to_local(DateTime.httpdate(publicPlurk['posted'])).strftime('%Q')
 
 	#If the plurk is posted on today, write the content and reponse to html flie
 
@@ -61,7 +63,7 @@ publicPlurks.each do |publicPlurk|
 
 		content = publicPlurk['content']
 
-		postedDate = DateTime.httpdate(publicPlurk['posted']).strftime('%Y-%m-%d %H:%M')
+		postedDate = timeZone.utc_to_local(DateTime.httpdate(publicPlurk['posted'])).strftime('%Y-%m-%d %H:%M')
 
 		fileHtml.puts '發噗日期：' + postedDate  + '<br>'
 		fileHtml.puts '發噗者：' + username  + '<br><br>'
