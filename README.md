@@ -57,7 +57,7 @@ http://zh.blog.plurk.com/archives/1121
 -----------
 
 ```bash
-$ ruby crawler.js ['使用者名稱']
+$ ruby crawler.rb ['使用者名稱']
 ```
 
 稍侯片刻後，備份內容將會自動儲存於output資料夾內。
