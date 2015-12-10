@@ -5,6 +5,16 @@ require 'tjplurker'
 
 include TJP
 
+def getUserName(tjp, userId)
+
+	result = tjp.get_public_profile(userId)
+
+	username =  result['user_info']['display_name']
+
+	return username
+
+end
+
 settingFile = File.read('./setting.json')
 setting = JSON.parse(settingFile)
 
